@@ -5,50 +5,43 @@ import pandas as pd
 import numpy as np
 from dash.dependencies import Output, Input
 
-# read data 
 data=pd.read_csv("avocado.csv")
 
-# get data records that have type=conventional and region=Chicago
-data=data.query("type == 'conventional' and region == 'Albany'")
+"""
+data=data.query("type == 'conventional' and region == 'Albany'") 
+--> this sort data to only of type conventional and region Albany
+"""
 
-# ???
 data["Date"]=pd.to_datetime(data["Date"], format="%Y-%m-%d")
-
-# sort data according to date
 data.sort_values("Date", inplace=True)
 
-external_stylesheets=[
+external_stylesheets = [
     {
         "href": "https://fonts.googleapis.com/css2?"
-                "family=Lato:wght@400;700&display=swap",
+        "family=Lato:wght@400;700&display=swap",
         "rel": "stylesheet",
-    }
+    },
 ]
-app=dash.Dash(__name__, external_stylesheets=external_stylesheets)
-app.title="Avocado Analytics: Understand Your Avocados!"
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.title = "Avocado Analytics: Understand Your Avocados!"
 
-app.layout=html.Div(
+app.layout = html.Div(
     children=[
         html.Div(
             children=[
-                html.P(
-                    children="🥑",
-                    className="header-emoji"
-                ),
+                html.P(children="🥑", className="header-emoji"),
                 html.H1(
-                    children="Avocado Analytics",
-                    className="header-title"
+                    children="Avocado Analytics", className="header-title"
                 ),
                 html.P(
                     children="Analyze the behavior of avocado prices"
-                               " and the number of avocados sold in the US"
-                               " between 2015 and 2018",
-                    className="header-description"
-                )
+                    " and the number of avocados sold in the US"
+                    " between 2015 and 2018",
+                    className="header-description",
+                ),
             ],
-            className="header"
+            className="header",
         ),
-
         html.Div(
             children=[
                 html.Div(
@@ -84,7 +77,10 @@ app.layout=html.Div(
                 ),
                 html.Div(
                     children=[
-                        html.Div(children="Date Range", className="menu-title"),
+                        html.Div(
+                            children="Date Range",
+                            className="menu-title"
+                            ),
                         dcc.DatePickerRange(
                             id="date-range",
                             min_date_allowed=data.Date.min().date(),
@@ -97,28 +93,26 @@ app.layout=html.Div(
             ],
             className="menu",
         ),
-
         html.Div(
             children=[
                 html.Div(
                     children=dcc.Graph(
-                        id="price-chart",
-                        config={"displayModeBar": False},
+                        id="price-chart", config={"displayModeBar": False},
                     ),
-                    className="card"
+                    className="card",
                 ),
                 html.Div(
                     children=dcc.Graph(
-                        id="volume-chart",
-                        config={"displayModeBar": False},
+                        id="volume-chart", config={"displayModeBar": False},
                     ),
-                    className="card"
+                    className="card",
                 ),
             ],
-            className="wrapper"
+            className="wrapper",
         ),
     ]
 )
+
 
 @app.callback(
     [Output("price-chart", "figure"), Output("volume-chart", "figure")],
@@ -144,12 +138,12 @@ def update_charts(region, avocado_type, start_date, end_date):
                 "x": filtered_data["Date"],
                 "y": filtered_data["AveragePrice"],
                 "type": "lines",
-                "hovertemplate": "$%{y:.2f}<extra></extra>"
+                "hovertemplate": "$%{y:.2f}<extra></extra>",
             },
         ],
         "layout": {
             "title": {
-                "text": "Average Price of Avocados", 
+                "text": "Average Price of Avocados",
                 "x": 0.05,
                 "xanchor": "left",
             },
@@ -168,18 +162,14 @@ def update_charts(region, avocado_type, start_date, end_date):
             },
         ],
         "layout": {
-            "title": {
-                "text": "Avocados Sold", 
-                "x": 0.05,
-                "xanchor": "left",
-            },
+            "title": {"text": "Avocados Sold", "x": 0.05, "xanchor": "left"},
             "xaxis": {"fixedrange": True},
-            "yaxis": {"tickprefix": "$", "fixedrange": True},
+            "yaxis": {"fixedrange": True},
             "colorway": ["#E12D39"],
-        }
+        },
     }
-
     return price_chart_figure, volume_chart_figure
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
